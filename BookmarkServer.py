@@ -17,26 +17,6 @@
 #     that short name in its dictionary and redirects to the corresponding
 #     long URI.
 #
-# Your job in this exercise is to finish the server code.
-#
-# Here are the steps you need to complete:
-#
-#
-# 2. Write the code inside do_GET that sends a 303 redirect to a known name.
-#
-# 3. Write the code inside do_POST that sends a 400 error if the form fields
-#    are missing.
-#
-# 4. Write the code inside do_POST that sends a 303 redirect to the form
-#    after saving a newly submitted URI.
-#
-# 5. Write the code inside do_POST that sends a 404 error if a URI is not
-#    successfully checked (i.e. if CheckURI returns false).
-#
-# In each step, you'll need to delete a line of code that raises the
-# NotImplementedError exception.  These are there as placeholders in the
-# starter code.
-#
 # After writing each step, restart the server and run test.py to test it.
 
 import http.server
@@ -89,8 +69,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
 
         if name:
             if name in memory:
-                # 2. Send a 303 redirect to the long URI in memory[name].
-                #    Delete the following line.
+
                 self.send_response(303)
                 self.send_header('Location', memory[name])
                 self.end_headers()
@@ -118,8 +97,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
 
         # Check that the user submitted the form fields.
         if "longuri" not in params or "shortname" not in params:
-            # 3. Serve a 400 error with a useful message.
-            #    Delete the following line.
+
             self.send_response(400)
             self.send_header('Content-type', 'text/html charset=utf-8')
             self.end_headers()
@@ -133,16 +111,11 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             # This URI is good!  Remember it under the specified name.
             memory[shortname] = longuri
 
-            # 4. Serve a redirect to the root page (the form).
-            #    Delete the following line.
             self.send_response(303)
             self.send_header('Location', '/')
             self.end_headers()
         else:
             # Didn't successfully fetch the long URI.
-
-            # 5. Send a 404 error with a useful message.
-            #    Delete the following line.
             self.send_response(404)
             self.send_header('Content-type', 'text/html charset=utf-8')
             self.end_headers()
