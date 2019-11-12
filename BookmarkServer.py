@@ -90,10 +90,10 @@ class Shortener(http.server.BaseHTTPRequestHandler):
                 # Get the cookie from the headers and extract its value
                 # into a variable called 'name'.
                 c = cookies.SimpleCookie(self.headers["Cookie"])
-                name = c["yourname"].value
+                yourName = c["yourname"].value
 
                 # Craft a message, escaping any HTML special chars in name.
-                message = "Hey there, " + html_escape(name)
+                message = "Hey there, " + html_escape(yourName)
             except (KeyError, cookies.CookieError) as e:
                 message = "I'm not sure who you are!"
                 print(e)
@@ -135,7 +135,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
         iAmCookie["yourname"]["domain"] = 'localhost'
 
         # Check that the user submitted the form fields.
-        if "longuri" not in params or "shortname" not in params:
+        if "longuri" not in params or "shortname" not in params or "yourname" not in params:
 
             self.send_response(400)
             self.send_header('Content-type', 'text/html charset=utf-8')
