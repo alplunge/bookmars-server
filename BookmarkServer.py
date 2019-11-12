@@ -25,12 +25,17 @@ import os
 from urllib.parse import unquote, parse_qs
 import threading
 from socketserver import ThreadingMixIn
+from http import cookies
+from html import escape as html_escape
 
 memory = {}
 
 form = '''<!DOCTYPE html>
 <title>Bookmark Server</title>
 <form method="POST">
+    <label>What's your name again?
+        <input type="text" name="yourname">
+    </label>
     <label>Long URI:
         <input name="longuri">
     </label>
@@ -71,6 +76,24 @@ class Shortener(http.server.BaseHTTPRequestHandler):
         # Strip off the / and we have either empty string or a name.
         name = unquote(self.path[1:])
 
+        # Default message if we don't know a name.
+        message = "I don't know you yet!"
+
+        # Look for a cookie in the request.
+        if 'cookie' in self.headers:
+            try:
+                # Extract and decode the cookie.
+                # Get the cookie from the headers and extract its value
+                # into a variable called 'name'.
+                c = cookies.SimpleCookie(self.headers["Cookie"])
+                name = c["yourname"].value
+
+                # Craft a message, escaping any HTML special chars in name.
+                message = "Hey there, " + html_escape(name)
+            except (KeyError, cookies.CookieError) as e:
+                message = "I'm not sure who you are!"
+                print(e)
+
         if name:
             if name in memory:
 
@@ -88,16 +111,24 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            # List the known associations in the form.
+            # List the known associations and print name from existing cookie in the form.
             known = "\n".join("{} : {}".format(key, memory[key])
                               for key in sorted(memory.keys()))
-            self.wfile.write(form.format(known).encode())
+            finalOutput = known + "\n".join(message)                 
+            self.wfile.write(form.format(finalOutput).encode())
 
     def do_POST(self):
         # Decode the form data.
         length = int(self.headers.get('Content-length', 0))
         body = self.rfile.read(length).decode()
         params = parse_qs(body)
+        yourname = parse_qs(body)["yourname"][0]
+
+        # Create cookie.
+        iAmCookie = cookies.SimpleCookie()
+        iAmCookie["yourname"] = yourname
+        iAmCookie["yourname"]["max-age"] = 600
+        iAmCookie["yourname"]["domain"] = 'localhost'
 
         # Check that the user submitted the form fields.
         if "longuri" not in params or "shortname" not in params:
@@ -117,6 +148,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
 
             self.send_response(303)
             self.send_header('Location', '/')
+            self.send_header('Set-Cookie', iAmCookie['yourname'].OutputString())
             self.end_headers()
         else:
             # Didn't successfully fetch the long URI.
