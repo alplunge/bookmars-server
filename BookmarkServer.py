@@ -83,21 +83,6 @@ class Shortener(http.server.BaseHTTPRequestHandler):
         # Default message if we don't know a name.
         message = "I don't know you yet!"
 
-        # Look for a cookie in the request.
-        if 'cookie' in self.headers:
-            try:
-                # Extract and decode the cookie.
-                # Get the cookie from the headers and extract its value
-                # into a variable called 'name'.
-                c = cookies.SimpleCookie(self.headers["Cookie"])
-                yourName = c["yourname"].value
-
-                # Craft a message, escaping any HTML special chars in name.
-                message = "Hey there, " + html_escape(yourName)
-            except (KeyError, cookies.CookieError) as e:
-                message = "I'm not sure who you are!"
-                print(e)
-
         if name:
             if name in memory:
 
@@ -115,6 +100,22 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+
+             # Look for a cookie in the request.
+            if 'cookie' in self.headers:
+                try:
+                    # Extract and decode the cookie.
+                    # Get the cookie from the headers and extract its value
+                    # into a variable called 'name'.
+                    c = cookies.SimpleCookie(self.headers["Cookie"])
+                    yourName = c["yourname"].value
+
+                    # Craft a message, escaping any HTML special chars in name.
+                    message = "Hey there, " + html_escape(yourName)
+                except (KeyError, cookies.CookieError) as e:
+                    message = "I'm not sure who you are!"
+                    print(e)
+
             # List the known associations and print name from existing cookie in the form.
             known = "\n".join("{} : {}".format(key, memory[key])
                               for key in sorted(memory.keys()))
