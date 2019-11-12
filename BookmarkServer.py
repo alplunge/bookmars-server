@@ -114,7 +114,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             # List the known associations and print name from existing cookie in the form.
             known = "\n".join("{} : {}".format(key, memory[key])
                               for key in sorted(memory.keys()))
-            finalOutput = known + "\n".join(message)                 
+            finalOutput = known + "\n" + message                 
             self.wfile.write(form.format(finalOutput).encode())
 
     def do_POST(self):
