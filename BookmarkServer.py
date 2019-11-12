@@ -33,18 +33,22 @@ memory = {}
 form = '''<!DOCTYPE html>
 <title>Bookmark Server</title>
 <form method="POST">
-    <label>What's your name again?
-        <input type="text" name="yourname">
-    </label>
-    <label>Long URI:
-        <input name="longuri">
-    </label>
-    <br>
-    <label>Short name:
-        <input name="shortname">
-    </label>
-    <br>
-    <button type="submit">Save it!</button>
+    <p>
+        <label>What's your name again?
+            <input type="text" name="yourname">
+        </label>
+    </p>
+    <p>    
+        <label>Long URI:
+            <input name="longuri">
+        </label>
+        <br>
+        <label>Short name:
+            <input name="shortname">
+        </label>
+        <br>
+        <button type="submit">Save it!</button>
+    </p>
 </form>
 <p>URIs I know about:
 <pre>
